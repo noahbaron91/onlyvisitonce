@@ -17,6 +17,7 @@ app.use(async (req, res, next) => {
   }
 
   const clientIP = req.ip;
+  console.log('clientIP', clientIP);
 
   // Backdoor so we can test the app without being blocked automatically
   if (clientIP === allowedIp && req.query.dev === 'true') {
@@ -30,6 +31,7 @@ app.use(async (req, res, next) => {
   }
 
   const user = await prisma.user.findUnique({ where: { ip: req.ip } });
+  console.log('user', user);
 
   if (user) {
     res.sendStatus(403);
