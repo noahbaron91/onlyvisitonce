@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  ip    String  @unique
+  Votes Votes[]
+}
+
+model Votes {
+  id       Int @id @default(autoincrement())
+  userId   Int
+  adviceId Int
+  value    Int // 1 for upvote, -1 for downvote
+
+  user   User   @relation(fields: [userId], references: [id])
+  advice Advice @relation(fields: [adviceId], references: [id])
+
+  @@unique([userId, adviceId]) // Ensures that each user can vote on an advice only once
+}
+
+model Advice {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  advice    String
+
+  tally BigInt  @default(0)
+  Votes Votes[]
+}
