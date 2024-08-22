@@ -18,6 +18,7 @@ COPY . .
 RUN cd frontend && npm run build
 
 RUN cd backend && npm run build
+RUN cd backend && npx prisma generate
 
 # Expose the port that your app will run on
 EXPOSE 8080
