@@ -15,12 +15,12 @@ export function InitialPanel({
       <div className='flex gap-4'>
         <button
           onClick={() => onChangeState('write')}
-          className='text-white text-xl'
+          className='text-white underline text-xl'
         >
-          Leave advice
+          Write advice
         </button>
         <button
-          className='text-white text-xl'
+          className='text-white underline text-xl'
           onClick={() => onChangeState('read')}
         >
           Read advice

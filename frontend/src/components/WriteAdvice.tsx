@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { PageState } from './Panel';
 
 function ChevronLeft() {
@@ -10,8 +11,8 @@ function ChevronLeft() {
       xmlns='http://www.w3.org/2000/svg'
     >
       <path
-        fill-rule='evenodd'
-        clip-rule='evenodd'
+        fillRule='evenodd'
+        clipRule='evenodd'
         d='M17.0164 6.23332C17.4394 6.65638 17.4394 7.34231 17.0164 7.76538L11.2824 13.4993L17.0164 19.2333C17.4394 19.6564 17.4394 20.3423 17.0164 20.7654C16.5933 21.1884 15.9074 21.1884 15.4843 20.7654L8.98429 14.2654C8.56123 13.8423 8.56123 13.1564 8.98429 12.7333L15.4843 6.23332C15.9074 5.81025 16.5933 5.81025 17.0164 6.23332Z'
         fill='white'
       />
@@ -24,8 +25,45 @@ export function WriteAdvice({
 }: {
   onChangeState: (state: PageState) => void;
 }) {
+  const [advice, setAdvice] = useState('');
+
+  const submitAdvice = async () => {
+    try {
+      console.log(
+        JSON.stringify({
+          advice,
+        })
+      );
+
+      await fetch('/api/v1/advice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          advice,
+        }),
+      });
+
+      onChangeState('initial');
+    } catch (error) {
+      // TODO: Add toast error message
+      console.error(error);
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!advice) {
+      return;
+    }
+
+    await submitAdvice();
+  };
+
   return (
-    <div className='flex flex-col items-start gap-4 py-3'>
+    <form onSubmit={handleSubmit} className='flex flex-col items-start gap-4'>
       <div className='flex gap-3 items-center'>
         <button onClick={() => onChangeState('initial')}>
           <ChevronLeft />
@@ -36,11 +74,16 @@ export function WriteAdvice({
         What is a piece of advice you would give to your past self?
       </p>
       <textarea
+        value={advice}
+        onChange={(event) => setAdvice(event.target.value)}
         placeholder='Write some wise words for future visitors'
         className='text-white outline-none w-full px-4 py-2 h-32 rounded-lg'
         style={{ background: 'rgba(0, 0, 0, 0.5)' }}
+        required
       />
-      <button className='text-white'>Submit</button>
-    </div>
+      <button className='text-white' type='submit'>
+        Submit
+      </button>
+    </form>
   );
 }

@@ -1,18 +1,131 @@
 import express from 'express';
 import 'dotenv/config';
-import path from 'path';
 import { prisma } from './prisma';
 
 const app = express();
 const port = process.env.PORT || 8080;
 
 app.use(express.static('public'));
+app.use(express.json());
 
-app.get('*', async (req, res) => {
-  if (typeof req.ip !== 'string') {
-    res.redirect('https://www.google.com');
+// app.get('*', async (req, res) => {
+//   if (typeof req.ip !== 'string') {
+//     res.redirect('https://www.google.com');
+//     return;
+//   }
+//   try {
+//     const user = await prisma.user.findUnique({
+//       where: {
+//         ip: req.ip,
+//       },
+//     });
+
+//     if (user) {
+//       res.redirect('https://www.google.com');
+//       return;
+//     }
+
+//     res.sendFile(path.resolve('../frontend/dist/index.html'));
+
+//     await prisma.user.create({
+//       data: {
+//         ip: req.ip,
+//       },
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.sendStatus(500);
+//   }
+// });
+
+async function getMostUpvotedAdvice(userId: number) {
+  const result = await prisma.$queryRaw`
+  SELECT
+    "advice"."id",
+    "advice"."advice",
+    SUM("votes"."vote") AS "netVotes",
+    CASE WHEN SUM(
+      CASE WHEN "votes"."userId" = 1 THEN
+        "votes"."vote"
+      ELSE
+        0
+      END) > 0 THEN
+      1
+    WHEN SUM(
+      CASE WHEN "votes"."userId" = 1 THEN
+        "votes"."vote"
+      ELSE
+        0
+      END) < 0 THEN
+      - 1
+    ELSE
+      0
+    END AS "userVoteStatus"
+  FROM
+    "Advice" AS "advice"
+    LEFT JOIN "Votes" AS "votes" ON "advice"."id" = "votes"."adviceId"
+  GROUP BY
+    "advice"."id"
+  ORDER BY
+    "netVotes" DESC
+  LIMIT 10;`;
+
+  const formattedResult = (result as any).map((row: any) => ({
+    ...row,
+    netVotes: Number(row.netVotes), // Convert BigInt to Number
+  }));
+
+  return formattedResult;
+}
+
+const getMostRecentAdvice = async () => {
+  const result = await prisma.$queryRaw`
+  SELECT
+    "advice"."id",
+    "advice"."advice",
+    "advice"."createdAt",
+    SUM("votes"."vote") AS "netVotes",
+    CASE WHEN SUM(
+      CASE WHEN "votes"."userId" = 1 THEN
+        "votes"."vote"
+      ELSE
+        0
+      END) > 0 THEN
+      1
+    WHEN SUM(
+      CASE WHEN "votes"."userId" = 1 THEN
+        "votes"."vote"
+      ELSE
+        0
+      END) < 0 THEN
+      - 1
+    ELSE
+      0
+    END AS "userVoteStatus"
+  FROM
+    "Advice" AS "advice"
+    LEFT JOIN "Votes" AS "votes" ON "advice"."id" = "votes"."adviceId"
+  GROUP BY
+    "advice"."id"
+  ORDER BY
+    "createdAt" DESC
+  LIMIT 10;`;
+
+  const formattedResult = (result as any).map((row: any) => ({
+    ...row,
+    netVotes: Number(row.netVotes), // Convert BigInt to Number
+  }));
+
+  return formattedResult;
+};
+
+// TODO: Implement pagination
+app.get('/api/v1/advice', async (req, res) => {
+  if (req.query.filter !== 'top' && req.query.filter !== 'recent') {
+    res.status(400).send('Invalid filter');
     return;
   }
+
   try {
     const user = await prisma.user.findUnique({
       where: {
@@ -20,69 +133,18 @@ app.get('*', async (req, res) => {
       },
     });
 
-    if (user) {
-      res.redirect('https://www.google.com');
+    if (!user) {
+      res.status(400).send('Invalid user');
       return;
     }
 
-    res.sendFile(path.resolve('../frontend/dist/index.html'));
-
-    await prisma.user.create({
-      data: {
-        ip: req.ip,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.sendStatus(500);
-  }
-});
-
-async function getMostUpvotedAdvice() {
-  const adviceWithVotes = await prisma.advice.findMany({
-    take: 10,
-    select: {
-      id: true,
-      advice: true,
-      _count: {
-        select: {
-          Votes: {
-            where: {
-              value: 1, // Filter to count only upvotes
-            },
-          },
-        },
-      },
-    },
-    orderBy: {
-      Votes: { _count: 'desc' }, // Sort by the number of upvotes in descending order
-    },
-  });
-
-  return adviceWithVotes;
-}
-
-// TODO: Implement pagination
-app.get('/api/v1/advice', (req, res) => {
-  if (req.query.filter !== 'top' && req.query.filter !== 'recent') {
-    res.status(400).send('Invalid filter');
-    return;
-  }
-
-  try {
     if (req.query.filter === 'top') {
-      const advice = getMostUpvotedAdvice();
+      const advice = await getMostUpvotedAdvice(user.id);
       res.status(200).send(advice);
       return;
     }
 
-    const advice = prisma.advice.findMany({
-      take: 10,
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-
+    const advice = await getMostRecentAdvice();
     res.status(200).send(advice);
   } catch (error) {
     console.error(error);
@@ -92,17 +154,15 @@ app.get('/api/v1/advice', (req, res) => {
 
 app.put('/api/v1/advice/:id', async (req, res) => {
   try {
-    // vote: 1 for upvote, -1 for downvote
-    // const
-    const adviceId = req.body.id;
-    const vote = req.body.vote;
+    const adviceId = Number(req.params.id);
+    const vote = Number(req.body.vote);
 
-    if (typeof adviceId !== 'number') {
+    if (Number.isNaN(adviceId)) {
       res.status(400).send('Invalid advice id');
       return;
     }
 
-    if (typeof vote !== 'number' || (vote !== 1 && vote !== -1)) {
+    if (vote !== 1 && vote !== -1 && vote !== 0) {
       res.status(400).send('Invalid vote');
       return;
     }
@@ -112,27 +172,24 @@ app.put('/api/v1/advice/:id', async (req, res) => {
       return;
     }
 
-    // await prisma.votes.upsert({
-    //   create: {
-    //     value: vote,
-    //     user: {
-    //       connect: {
-    //         ip: req.ip,
-    //       },
-    //     },
-    //     advice: {
-    //       connect: {
-    //         id: adviceId,
-    //       },
-    //     },
-    //   },
-    //   update: {
-    //     value: vote,
-    //   },
-    //   where: {
+    const user = await prisma.user.findUnique({
+      where: {
+        ip: req.ip,
+      },
+    });
 
-    //   }
-    // });
+    if (!user?.id) {
+      res.status(400).send('Invalid user');
+      return;
+    }
+
+    const response = await prisma.votes.upsert({
+      update: { vote, adviceId, userId: user.id },
+      create: { vote, adviceId, userId: user.id },
+      where: { userId_adviceId: { userId: user.id, adviceId } },
+    });
+
+    res.send(response);
   } catch (error) {
     console.error(error);
     res.sendStatus(500);
@@ -148,10 +205,13 @@ app.post('/api/v1/advice', async (req, res) => {
   }
   try {
     const response = await prisma.advice.create({ data: { advice } });
-
     res.status(200).send(response);
   } catch (error) {
     console.error(error);
     res.sendStatus(500);
   }
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });

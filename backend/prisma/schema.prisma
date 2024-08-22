@@ -17,7 +17,7 @@ model Votes {
   id       Int @id @default(autoincrement())
   userId   Int
   adviceId Int
-  value    Int // 1 for upvote, -1 for downvote
+  vote     Int // 1 for upvote, -1 for downvote
 
   user   User   @relation(fields: [userId], references: [id])
   advice Advice @relation(fields: [adviceId], references: [id])
@@ -30,6 +30,5 @@ model Advice {
   createdAt DateTime @default(now())
   advice    String
 
-  tally BigInt  @default(0)
   Votes Votes[]
 }
