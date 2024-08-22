@@ -13,8 +13,8 @@ function ChevronLeft() {
       xmlns='http://www.w3.org/2000/svg'
     >
       <path
-        fill-rule='evenodd'
-        clip-rule='evenodd'
+        fillRule='evenodd'
+        clipRule='evenodd'
         d='M15.7071 5.29289C16.0976 5.68342 16.0976 6.31658 15.7071 6.70711L10.4142 12L15.7071 17.2929C16.0976 17.6834 16.0976 18.3166 15.7071 18.7071C15.3166 19.0976 14.6834 19.0976 14.2929 18.7071L8.29289 12.7071C7.90237 12.3166 7.90237 11.6834 8.29289 11.2929L14.2929 5.29289C14.6834 4.90237 15.3166 4.90237 15.7071 5.29289Z'
         fill='white'
       />
@@ -67,16 +67,82 @@ const getAdvice = async (url: string) => {
 
 type Filter = 'top' | 'recent';
 
-function AdviceList({ filter }: { filter: Filter }) {
-  const { data, mutate } = useSWR<
-    {
+function Advice({
+  advice,
+  id,
+  netVotes,
+  userVoteStatus,
+  onDownvote,
+  onUpvote,
+}: {
+  advice: string;
+  netVotes: number;
+  userVoteStatus: number;
+  id: number;
+  onUpvote: () => void;
+  onDownvote: () => void;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className='flex flex-col gap-1' key={id}>
+      <p
+        className={twMerge(
+          'text-white w-full leading-snug ',
+          !isExpanded && 'line-clamp-4'
+        )}
+        style={{ wordBreak: 'break-word' }}
+        onClick={() => setIsExpanded((prev) => !prev)}
+      >
+        {advice}
+      </p>
+      <div className='flex gap-1 items-center'>
+        <button
+          style={{ fill: userVoteStatus === 1 ? '#00C2FF' : 'white' }}
+          type='button'
+          onClick={onUpvote}
+        >
+          <Upvote />
+        </button>
+        <p
+          className='text-white text-xl min-w-4 text-center'
+          onClick={(event) => event.stopPropagation()}
+        >
+          {netVotes}
+        </p>
+        <button
+          style={{ fill: userVoteStatus === -1 ? '#00C2FF' : 'white' }}
+          type='button'
+          onClick={onDownvote}
+        >
+          <Downvote />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function AdviceListPage({
+  filter,
+  page,
+  isLastPage,
+  loadMore,
+}: {
+  filter: Filter;
+  page: number;
+  isLastPage: boolean;
+  loadMore: () => void;
+}) {
+  const { data, mutate } = useSWR<{
+    data: {
       id: number;
       advice: string;
       value: null | -1 | 1;
       netVotes: number;
       userVoteStatus: number;
-    }[]
-  >(`/api/v1/advice?filter=${filter}`, getAdvice);
+    }[];
+    hasMore: boolean;
+  }>(`/api/v1/advice?filter=${filter}&page=${page}`, getAdvice);
 
   if (!data) {
     return <p className='text-white'>Loading...</p>;
@@ -102,7 +168,7 @@ function AdviceList({ filter }: { filter: Filter }) {
   const handleUpvoteAdvice = async (id: number) => {
     if (!data) return;
 
-    const advice = data.find((advice) => advice.id === id);
+    const advice = data.data.find((advice) => advice.id === id);
     if (!advice) return;
 
     if (advice.userVoteStatus === 1) {
@@ -116,7 +182,7 @@ function AdviceList({ filter }: { filter: Filter }) {
   const handleDownvoteAdvice = async (id: number) => {
     if (!data) return;
 
-    const advice = data.find((advice) => advice.id === id);
+    const advice = data.data.find((advice) => advice.id === id);
 
     if (!advice) return;
 
@@ -128,42 +194,51 @@ function AdviceList({ filter }: { filter: Filter }) {
     await voteForAdvice(id, -1);
   };
 
-  if (data.length === 0) {
+  if (data.data.length === 0) {
     return null;
   }
 
-  return data.map(({ advice, id, netVotes, userVoteStatus }) => (
-    <div className='flex flex-col gap-1' key={id}>
-      <p
-        className='text-white w-full leading-snug'
-        style={{ wordBreak: 'break-word' }}
-      >
-        {advice}
-      </p>
-      <div className='flex gap-1 items-center'>
+  return (
+    <>
+      {data.data.map(({ advice, id, netVotes, userVoteStatus }) => (
+        <Advice
+          advice={advice}
+          id={id}
+          key={id}
+          netVotes={netVotes}
+          onDownvote={() => handleDownvoteAdvice(id)}
+          onUpvote={() => handleUpvoteAdvice(id)}
+          userVoteStatus={userVoteStatus}
+        />
+      ))}
+      {isLastPage && data.hasMore && (
         <button
-          style={{ fill: userVoteStatus === 1 ? '#00C2FF' : 'white' }}
-          type='button'
-          onClick={() => handleUpvoteAdvice(id)}
+          className='text-black bg-white w-full py-2 font-bold'
+          onClick={loadMore}
         >
-          <Upvote />
+          Load more
         </button>
-        <p
-          className='text-white text-xl min-w-4 text-center'
-          onClick={(event) => event.stopPropagation()}
-        >
-          {netVotes}
-        </p>
-        <button
-          style={{ fill: userVoteStatus === -1 ? '#00C2FF' : 'white' }}
-          type='button'
-          onClick={() => handleDownvoteAdvice(id)}
-        >
-          <Downvote />
-        </button>
-      </div>
+      )}
+    </>
+  );
+}
+
+function AdviceList({ filter }: { filter: Filter }) {
+  const [pageIndex, setPageIndex] = useState(0);
+
+  return (
+    <div className='flex flex-col gap-3 py-3 overflow-y-scroll max-h-[calc(100vh-175px)]'>
+      {Array.from({ length: pageIndex + 1 }).map((_, index) => (
+        <AdviceListPage
+          key={index}
+          filter={filter}
+          page={index}
+          isLastPage={pageIndex === index}
+          loadMore={() => setPageIndex((prev) => prev + 1)}
+        />
+      ))}
     </div>
-  ));
+  );
 }
 
 export function ReadAdvice({

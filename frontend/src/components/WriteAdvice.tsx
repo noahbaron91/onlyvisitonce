@@ -29,12 +29,6 @@ export function WriteAdvice({
 
   const submitAdvice = async () => {
     try {
-      console.log(
-        JSON.stringify({
-          advice,
-        })
-      );
-
       await fetch('/api/v1/advice', {
         method: 'POST',
         headers: {

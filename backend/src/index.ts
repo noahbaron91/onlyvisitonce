@@ -38,21 +38,25 @@ app.use(express.json());
 //   }
 // });
 
-async function getMostUpvotedAdvice(userId: number) {
+const PAGE_SIZE = 10;
+
+async function getMostUpvotedAdvice(userId: number, page: number) {
+  const offset = page * PAGE_SIZE;
+
   const result = await prisma.$queryRaw`
   SELECT
     "advice"."id",
     "advice"."advice",
     SUM("votes"."vote") AS "netVotes",
     CASE WHEN SUM(
-      CASE WHEN "votes"."userId" = 1 THEN
+      CASE WHEN "votes"."userId" = ${userId} THEN
         "votes"."vote"
       ELSE
         0
       END) > 0 THEN
       1
     WHEN SUM(
-      CASE WHEN "votes"."userId" = 1 THEN
+      CASE WHEN "votes"."userId" = ${userId} THEN
         "votes"."vote"
       ELSE
         0
@@ -68,7 +72,7 @@ async function getMostUpvotedAdvice(userId: number) {
     "advice"."id"
   ORDER BY
     "netVotes" DESC
-  LIMIT 10;`;
+  LIMIT ${PAGE_SIZE} OFFSET ${offset};`;
 
   const formattedResult = (result as any).map((row: any) => ({
     ...row,
@@ -109,7 +113,7 @@ const getMostRecentAdvice = async () => {
     "advice"."id"
   ORDER BY
     "createdAt" DESC
-  LIMIT 10;`;
+  LIMIT ${PAGE_SIZE};`;
 
   const formattedResult = (result as any).map((row: any) => ({
     ...row,
@@ -119,12 +123,19 @@ const getMostRecentAdvice = async () => {
   return formattedResult;
 };
 
+const checkIfHasMore = async (page: number) => {
+  const numberOfAdvice = await prisma.advice.count();
+  return numberOfAdvice > page * PAGE_SIZE;
+};
+
 // TODO: Implement pagination
 app.get('/api/v1/advice', async (req, res) => {
   if (req.query.filter !== 'top' && req.query.filter !== 'recent') {
     res.status(400).send('Invalid filter');
     return;
   }
+
+  const page = Number(req.query.page) || 0;
 
   try {
     const user = await prisma.user.findUnique({
@@ -139,13 +150,16 @@ app.get('/api/v1/advice', async (req, res) => {
     }
 
     if (req.query.filter === 'top') {
-      const advice = await getMostUpvotedAdvice(user.id);
-      res.status(200).send(advice);
+      const advice = await getMostUpvotedAdvice(user.id, page);
+      const hasMore = await checkIfHasMore(page);
+      res.status(200).send({ data: advice, hasMore });
       return;
     }
 
     const advice = await getMostRecentAdvice();
-    res.status(200).send(advice);
+    const hasMore = await checkIfHasMore(page);
+
+    res.status(200).send({ data: advice, hasMore });
   } catch (error) {
     console.error(error);
     res.sendStatus(500);
