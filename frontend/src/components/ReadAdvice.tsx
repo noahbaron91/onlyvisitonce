@@ -6,16 +6,16 @@ import useSWR from 'swr';
 function ChevronLeft() {
   return (
     <svg
-      width='26'
-      height='27'
-      viewBox='0 0 26 27'
+      width='24'
+      height='24'
+      viewBox='0 0 24 24'
       fill='none'
       xmlns='http://www.w3.org/2000/svg'
     >
       <path
-        fillRule='evenodd'
-        clipRule='evenodd'
-        d='M17.0164 6.23332C17.4394 6.65638 17.4394 7.34231 17.0164 7.76538L11.2824 13.4993L17.0164 19.2333C17.4394 19.6564 17.4394 20.3423 17.0164 20.7654C16.5933 21.1884 15.9074 21.1884 15.4843 20.7654L8.98429 14.2654C8.56123 13.8423 8.56123 13.1564 8.98429 12.7333L15.4843 6.23332C15.9074 5.81025 16.5933 5.81025 17.0164 6.23332Z'
+        fill-rule='evenodd'
+        clip-rule='evenodd'
+        d='M15.7071 5.29289C16.0976 5.68342 16.0976 6.31658 15.7071 6.70711L10.4142 12L15.7071 17.2929C16.0976 17.6834 16.0976 18.3166 15.7071 18.7071C15.3166 19.0976 14.6834 19.0976 14.2929 18.7071L8.29289 12.7071C7.90237 12.3166 7.90237 11.6834 8.29289 11.2929L14.2929 5.29289C14.6834 4.90237 15.3166 4.90237 15.7071 5.29289Z'
         fill='white'
       />
     </svg>
@@ -132,11 +132,14 @@ function AdviceList({ filter }: { filter: Filter }) {
     return null;
   }
 
-  console.log(data);
-
   return data.map(({ advice, id, netVotes, userVoteStatus }) => (
-    <div className='flex flex-col gap-2' key={id}>
-      <p className='text-white'>{advice}</p>
+    <div className='flex flex-col gap-1' key={id}>
+      <p
+        className='text-white w-full leading-snug'
+        style={{ wordBreak: 'break-word' }}
+      >
+        {advice}
+      </p>
       <div className='flex gap-1 items-center'>
         <button
           style={{ fill: userVoteStatus === 1 ? '#00C2FF' : 'white' }}
@@ -145,7 +148,12 @@ function AdviceList({ filter }: { filter: Filter }) {
         >
           <Upvote />
         </button>
-        <p className='text-white text-xl'>{netVotes}</p>
+        <p
+          className='text-white text-xl min-w-4 text-center'
+          onClick={(event) => event.stopPropagation()}
+        >
+          {netVotes}
+        </p>
         <button
           style={{ fill: userVoteStatus === -1 ? '#00C2FF' : 'white' }}
           type='button'
