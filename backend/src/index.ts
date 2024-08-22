@@ -1,6 +1,7 @@
 import express from 'express';
 import 'dotenv/config';
 import { prisma } from './prisma';
+import path from 'path';
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -37,6 +38,8 @@ app.use(express.json());
 //     res.sendStatus(500);
 //   }
 // });
+
+app.use(express.static(path.resolve('../frontend/dist')));
 
 const PAGE_SIZE = 10;
 
@@ -224,6 +227,10 @@ app.post('/api/v1/advice', async (req, res) => {
     console.error(error);
     res.sendStatus(500);
   }
+});
+
+app.get('*', (_, res) => {
+  res.sendFile(path.resolve('../frontend/dist/index.html'));
 });
 
 app.listen(port, () => {

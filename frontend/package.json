@@ -13,7 +13,6 @@
     "@fontsource-variable/pixelify-sans": "^5.0.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-query": "^3.39.3",
     "swr": "^2.2.5",
     "tailwind-merge": "^2.5.2"
   },
