@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import type { PageState } from './Panel';
+import { twMerge } from 'tailwind-merge';
 
 function ChevronLeft() {
   return (
@@ -24,18 +26,36 @@ export function ReadAdvice({
 }: {
   onChangeState: (state: PageState) => void;
 }) {
+  const [filter, setFilter] = useState<'top' | 'recent'>('top');
+
   return (
-    <>
-      <div className='flex items-center gap-5'>
-        <div className='flex gap-4 items-center'>
+    <div className='flex flex-col items-start gap-3'>
+      <div className='flex gap-3 items-center'>
+        <button onClick={() => onChangeState('initial')}>
           <ChevronLeft />
-          <h3 className='text-white text-2xl'>Read advice</h3>
-        </div>
-        <div className='flex items-center gap-6'>
-          <p className='text-white text-2xl'>Top</p>
-          <p className='text-white text-2xl'>Recent</p>
-        </div>
+        </button>
+        <h3 className='text-white text-xl'>Read advice</h3>
       </div>
-    </>
+      <div className='flex items-center gap-6'>
+        <button
+          className={twMerge(
+            'text-white text-xl',
+            filter === 'top' && 'underline'
+          )}
+          onClick={() => setFilter('top')}
+        >
+          Top
+        </button>
+        <p
+          className={twMerge(
+            'text-white text-xl',
+            filter === 'recent' && 'underline'
+          )}
+          onClick={() => setFilter('recent')}
+        >
+          Recent
+        </p>
+      </div>
+    </div>
   );
 }
