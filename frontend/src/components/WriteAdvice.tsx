@@ -58,13 +58,13 @@ export function WriteAdvice({
 
   return (
     <form onSubmit={handleSubmit} className='flex flex-col items-start gap-4'>
-      <div className='flex gap-3 items-center'>
+      <div className='flex gap-2 items-center'>
         <button onClick={() => onChangeState('initial')}>
           <ChevronLeft />
         </button>
         <h3 className='text-white text-xl'>Write advice</h3>
       </div>
-      <p className='text-white'>
+      <p className='text-white text-xl'>
         What is a piece of advice you would give to your past self?
       </p>
       <textarea
@@ -75,7 +75,7 @@ export function WriteAdvice({
         style={{ background: 'rgba(0, 0, 0, 0.5)' }}
         required
       />
-      <button className='text-white' type='submit'>
+      <button className='text-white text-xl' type='submit'>
         Submit
       </button>
     </form>

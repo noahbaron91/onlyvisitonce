@@ -91,7 +91,7 @@ async function getMostUpvotedAdvice(userId: number, page: number) {
   return formattedResult;
 }
 
-const getMostRecentAdvice = async () => {
+const getMostRecentAdvice = async (userId: number, page: number) => {
   const result = await prisma.$queryRaw`
   SELECT
     "advice"."id",
@@ -99,14 +99,14 @@ const getMostRecentAdvice = async () => {
     "advice"."createdAt",
     SUM("votes"."vote") AS "netVotes",
     CASE WHEN SUM(
-      CASE WHEN "votes"."userId" = 1 THEN
+      CASE WHEN "votes"."userId" = ${userId} THEN
         "votes"."vote"
       ELSE
         0
       END) > 0 THEN
       1
     WHEN SUM(
-      CASE WHEN "votes"."userId" = 1 THEN
+      CASE WHEN "votes"."userId" = ${userId} THEN
         "votes"."vote"
       ELSE
         0
@@ -134,7 +134,7 @@ const getMostRecentAdvice = async () => {
 
 const checkIfHasMore = async (page: number) => {
   const numberOfAdvice = await prisma.advice.count();
-  return numberOfAdvice > page * PAGE_SIZE;
+  return numberOfAdvice > (page + 1) * PAGE_SIZE;
 };
 
 // TODO: Implement pagination
@@ -165,7 +165,7 @@ app.get('/api/v1/advice', async (req, res) => {
       return;
     }
 
-    const advice = await getMostRecentAdvice();
+    const advice = await getMostRecentAdvice(user.id, page);
     const hasMore = await checkIfHasMore(page);
 
     res.status(200).send({ data: advice, hasMore });

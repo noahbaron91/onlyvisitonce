@@ -6,16 +6,16 @@ import useSWR from 'swr';
 function ChevronLeft() {
   return (
     <svg
-      width='24'
-      height='24'
-      viewBox='0 0 24 24'
+      width='26'
+      height='27'
+      viewBox='0 0 26 27'
       fill='none'
       xmlns='http://www.w3.org/2000/svg'
     >
       <path
         fillRule='evenodd'
         clipRule='evenodd'
-        d='M15.7071 5.29289C16.0976 5.68342 16.0976 6.31658 15.7071 6.70711L10.4142 12L15.7071 17.2929C16.0976 17.6834 16.0976 18.3166 15.7071 18.7071C15.3166 19.0976 14.6834 19.0976 14.2929 18.7071L8.29289 12.7071C7.90237 12.3166 7.90237 11.6834 8.29289 11.2929L14.2929 5.29289C14.6834 4.90237 15.3166 4.90237 15.7071 5.29289Z'
+        d='M17.0164 6.23332C17.4394 6.65638 17.4394 7.34231 17.0164 7.76538L11.2824 13.4993L17.0164 19.2333C17.4394 19.6564 17.4394 20.3423 17.0164 20.7654C16.5933 21.1884 15.9074 21.1884 15.4843 20.7654L8.98429 14.2654C8.56123 13.8423 8.56123 13.1564 8.98429 12.7333L15.4843 6.23332C15.9074 5.81025 16.5933 5.81025 17.0164 6.23332Z'
         fill='white'
       />
     </svg>
@@ -85,10 +85,10 @@ function Advice({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className='flex flex-col gap-1' key={id}>
+    <div className='flex flex-col ' key={id}>
       <p
         className={twMerge(
-          'text-white w-full leading-snug ',
+          'text-white w-full leading-snug text-xl',
           !isExpanded && 'line-clamp-4'
         )}
         style={{ wordBreak: 'break-word' }}
@@ -213,10 +213,10 @@ function AdviceListPage({
       ))}
       {isLastPage && data.hasMore && (
         <button
-          className='text-black bg-white w-full py-2 font-bold'
+          className='text-black bg-white w-full py-2 font-bold mt-2'
           onClick={loadMore}
         >
-          Load more
+          Read more
         </button>
       )}
     </>
@@ -227,7 +227,7 @@ function AdviceList({ filter }: { filter: Filter }) {
   const [pageIndex, setPageIndex] = useState(0);
 
   return (
-    <div className='flex flex-col gap-3 py-3 overflow-y-scroll max-h-[calc(100vh-175px)]'>
+    <div className='flex flex-col gap-3 py-3 overflow-y-scroll max-h-[calc(100vh-175px)] w-full'>
       {Array.from({ length: pageIndex + 1 }).map((_, index) => (
         <AdviceListPage
           key={index}
@@ -250,7 +250,7 @@ export function ReadAdvice({
 
   return (
     <div className='flex flex-col items-start gap-3'>
-      <div className='flex gap-3 items-center'>
+      <div className='flex gap-2 items-center'>
         <button onClick={() => onChangeState('initial')}>
           <ChevronLeft />
         </button>
