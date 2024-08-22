@@ -6,38 +6,34 @@ import path from 'path';
 const app = express();
 const port = process.env.PORT || 8080;
 
-app.use(express.static('public'));
+app.set('trust proxy', true);
+
+app.use(async (req, res, next) => {
+  if (req.path !== '/') {
+    next();
+    return;
+  }
+
+  const clientIP = req.ip;
+
+  if (typeof clientIP !== 'string') {
+    res.sendStatus(403);
+    return;
+  }
+
+  const user = await prisma.user.findUnique({ where: { ip: req.ip } });
+
+  if (user) {
+    res.sendStatus(403);
+    return;
+  }
+
+  await prisma.user.create({ data: { ip: clientIP } });
+
+  next();
+});
+
 app.use(express.json());
-
-// app.get('*', async (req, res) => {
-//   if (typeof req.ip !== 'string') {
-//     res.redirect('https://www.google.com');
-//     return;
-//   }
-//   try {
-//     const user = await prisma.user.findUnique({
-//       where: {
-//         ip: req.ip,
-//       },
-//     });
-
-//     if (user) {
-//       res.redirect('https://www.google.com');
-//       return;
-//     }
-
-//     res.sendFile(path.resolve('../frontend/dist/index.html'));
-
-//     await prisma.user.create({
-//       data: {
-//         ip: req.ip,
-//       },
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.sendStatus(500);
-//   }
-// });
 
 app.use(express.static(path.resolve('../frontend/dist')));
 
@@ -227,10 +223,6 @@ app.post('/api/v1/advice', async (req, res) => {
     console.error(error);
     res.sendStatus(500);
   }
-});
-
-app.get('*', (_, res) => {
-  res.sendFile(path.resolve('../frontend/dist/index.html'));
 });
 
 app.listen(port, () => {
