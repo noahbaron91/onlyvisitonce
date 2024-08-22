@@ -8,6 +8,8 @@ const port = process.env.PORT || 8080;
 
 app.set('trust proxy', true);
 
+const allowedIp = process.env.ALLOWED_IP;
+
 app.use(async (req, res, next) => {
   if (req.path !== '/') {
     next();
@@ -15,6 +17,12 @@ app.use(async (req, res, next) => {
   }
 
   const clientIP = req.ip;
+
+  // Backdoor so we can test the app without being blocked automatically
+  if (clientIP === allowedIp && req.query.dev === 'true') {
+    next();
+    return;
+  }
 
   if (typeof clientIP !== 'string') {
     res.sendStatus(403);
