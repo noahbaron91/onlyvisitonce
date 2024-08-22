@@ -27,4 +27,4 @@ EXPOSE 8080
 WORKDIR /app/backend
 
 # Define the command to run your app
-CMD ["npm", "run", "start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
