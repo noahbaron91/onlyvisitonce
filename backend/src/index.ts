@@ -24,8 +24,9 @@ app.use((req, res, next) => {
     return;
   }
 
-  if (req.cookies['visited'] === 1) {
-    res.status(403).send('You have already visited this page');
+  if (req.cookies['visited'] === '1') {
+    console.log(req.ip, 'Cookie exists, user has already visited this website');
+    res.status(403).send('You have already visited this website');
     return;
   }
 
@@ -49,6 +50,7 @@ app.use(async (req, res, next) => {
   }
 
   if (typeof clientIP !== 'string') {
+    console.log('Invalid IP');
     res.status(403).send('You have already visited this website');
     return;
   }
@@ -56,6 +58,7 @@ app.use(async (req, res, next) => {
   const user = await prisma.user.findUnique({ where: { ip: req.ip } });
 
   if (user) {
+    console.log(req.ip, 'User already exists');
     res.status(403).send('You have already visited this website');
     return;
   }
