@@ -49,14 +49,14 @@ app.use(async (req, res, next) => {
   }
 
   if (typeof clientIP !== 'string') {
-    res.status(403).send('You have already visited this page');
+    res.status(403).send('You have already visited this website');
     return;
   }
 
   const user = await prisma.user.findUnique({ where: { ip: req.ip } });
 
   if (user) {
-    res.status(403).send('You have already visited this page');
+    res.status(403).send('You have already visited this website');
     return;
   }
 
