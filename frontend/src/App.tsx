@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import '@fontsource-variable/pixelify-sans';
 import { Panel } from './components/Panel';
 import { HasLoadedProvider } from './context/HasLoaded';
@@ -95,7 +95,28 @@ function App() {
   }, []);
 
   const [isPanelVisibile, setIsPanelVisible] = useState(true);
-  const [isMusicPlaying, setIsMusicPlaying] = useState(true);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const handleToggleMusic = () => {
+    if (!audioRef.current) return;
+
+    if (isMusicPlaying) {
+      audioRef.current.pause();
+      setIsMusicPlaying(false);
+      return;
+    }
+
+    audioRef.current.play();
+    setIsMusicPlaying(true);
+  };
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    audioRef.current.volume = 0.4;
+  }, []);
 
   return (
     <HasLoadedProvider>
@@ -116,12 +137,14 @@ function App() {
           >
             {isPanelVisibile ? <EyeIcon /> : <CloseEyeIcon />}
           </button>
-          <button
-            type='button'
-            id='music-button'
-            onClick={() => setIsMusicPlaying(!isMusicPlaying)}
-          >
+          <button type='button' id='music-button' onClick={handleToggleMusic}>
             {isMusicPlaying ? <MusicIcon /> : <CloseMusicIcon />}
+            <audio
+              src='https://static.onlyvisitonce.com/rain-sounds-shorter.mp3'
+              autoPlay
+              loop
+              ref={audioRef}
+            ></audio>
           </button>
         </div>
       </div>
