@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fingerprintjs/fingerprintjs": "^4.4.3",
     "@fontsource-variable/pixelify-sans": "^5.0.4",
     "perfect-scrollbar": "^1.5.5",
     "react": "^18.3.1",

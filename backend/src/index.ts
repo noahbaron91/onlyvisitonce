@@ -2,13 +2,25 @@ import express from 'express';
 import 'dotenv/config';
 import { prisma } from './prisma';
 import path from 'path';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const port = process.env.PORT || 8080;
 
 app.set('trust proxy', true);
+app.use(cookieParser());
 
 const allowedIp = process.env.ALLOWED_IP;
+
+app.use((req, res, next) => {
+  // Cookie blocking mechanism
+  if (req.cookies['visited'] === 1) {
+    return;
+  }
+
+  res.cookie('visited', 1, { maxAge: 1000 * 60 * 60 * 24 * 365 });
+  next();
+});
 
 app.use(async (req, res, next) => {
   if (req.path !== '/') {
@@ -26,15 +38,12 @@ app.use(async (req, res, next) => {
   }
 
   if (typeof clientIP !== 'string') {
-    res.sendStatus(403);
     return;
   }
 
   const user = await prisma.user.findUnique({ where: { ip: req.ip } });
-  console.log('user', user);
 
   if (user) {
-    res.sendStatus(403);
     return;
   }
 
@@ -171,6 +180,35 @@ app.get('/api/v1/advice', async (req, res) => {
     const hasMore = await checkIfHasMore(page);
 
     res.status(200).send({ data: advice, hasMore });
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+});
+
+app.get('/api/v1/fingerprint', async (req, res) => {
+  try {
+    const id = req.query.id;
+
+    if (typeof id !== 'string') {
+      res.status(400).send('Invalid id');
+      return;
+    }
+
+    const fingerprintExists = await prisma.broserFingerprint.findUnique({
+      where: { fingerprint: id },
+    });
+
+    if (fingerprintExists) {
+      res.sendStatus(200);
+      return;
+    }
+
+    await prisma.broserFingerprint.create({
+      data: { fingerprint: id },
+    });
+
+    res.sendStatus(404);
   } catch (error) {
     console.error(error);
     res.sendStatus(500);

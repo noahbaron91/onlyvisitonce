@@ -4,6 +4,7 @@ import { Panel } from './components/Panel';
 import { HasLoadedProvider } from './context/HasLoaded';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import { AmountOfAdviceLeftProvider } from './context/AmountOfAdviceLeft';
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 function EyeIcon() {
   return (
@@ -88,7 +89,45 @@ function CloseMusicIcon() {
   );
 }
 
+const useLocalStorageBlocking = () => {
+  useEffect(() => {
+    const hasPreviouslyVisited = localStorage.getItem('visited');
+
+    if (hasPreviouslyVisited === '1') {
+      localStorage.setItem('visited', '1');
+      return;
+    }
+
+    window.location.href = 'https://google.com';
+  }, []);
+};
+
+const useFingerprintBlocking = () => {
+  const getFingerPrint = async () => {
+    const fp = await FingerprintJS.load();
+
+    const { visitorId } = await fp.get();
+
+    return visitorId;
+  };
+
+  useEffect(() => {
+    getFingerPrint().then((visitorId) => {
+      console.log('visitorId', visitorId);
+      fetch(`/api/v1/fingerprint?id=${visitorId}`).then((res) => {
+        if (res.status === 200) {
+          window.location.href = 'https://google.com';
+          return;
+        }
+      });
+    });
+  }, []);
+};
+
 function App() {
+  useFingerprintBlocking();
+  useLocalStorageBlocking();
+
   useEffect(() => {
     const textElement = document.getElementById('text');
     if (!textElement) return;

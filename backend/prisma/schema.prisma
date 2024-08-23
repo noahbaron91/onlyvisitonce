@@ -8,6 +8,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model BroserFingerprint {
+  id          Int      @id @default(autoincrement())
+  fingerprint String   @unique
+  createdAt   DateTime @default(now())
+}
+
 model User {
   id    Int     @id @default(autoincrement())
   ip    String  @unique
