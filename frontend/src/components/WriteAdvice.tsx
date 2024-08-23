@@ -39,7 +39,7 @@ export function WriteAdvice({
         }),
       });
 
-      onChangeState('initial');
+      onChangeState('success');
     } catch (error) {
       // TODO: Add toast error message
       console.error(error);

@@ -102,7 +102,7 @@ function App() {
         loop
         style={{ objectPosition: '-550px 0px' }}
         className='-z-10 object-cover fixed top-0 left-0 w-screen h-screen'
-        src='/bonfire.mp4'
+        src='https://static.onlyvisitonce.com/knight-at-night.mp4'
         muted
       />
       {isPanelVisibile ? <Panel /> : null}

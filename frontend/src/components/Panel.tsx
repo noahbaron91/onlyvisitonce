@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { WriteAdvice } from './WriteAdvice';
 import { ReadAdvice } from './ReadAdvice';
 import { InitialPanel } from './InitialPanel';
+import { SuccessPanel } from './SuccessPanel';
 
-export type PageState = 'initial' | 'read' | 'write';
+export type PageState = 'initial' | 'read' | 'write' | 'success';
 
 function InsideContent() {
   const [pageState, setPageState] = useState<PageState>('initial');
@@ -17,6 +18,9 @@ function InsideContent() {
     }
     case 'initial': {
       return <InitialPanel onChangeState={setPageState} />;
+    }
+    case 'success': {
+      return <SuccessPanel onChangeState={setPageState} />;
     }
   }
 }

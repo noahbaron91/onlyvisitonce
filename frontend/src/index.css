@@ -5,3 +5,20 @@
 body {
   font-family: 'Pixelify Sans Variable', system-ui;
 }
+
+html {
+  background: #03050d;
+}
+
+video {
+  animation: fadeIn ease 2s;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
