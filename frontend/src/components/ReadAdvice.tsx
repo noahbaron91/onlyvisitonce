@@ -150,7 +150,28 @@ function AdviceListPage({
 
   const voteForAdvice = async (id: number, vote: -1 | 0 | 1) => {
     try {
-      // TOODO: Optimistic update with swr
+      const optimisticData = data.data.map((advice) => {
+        if (advice.id === id) {
+          return {
+            ...advice,
+            netVotes: advice.netVotes + vote - advice.userVoteStatus,
+            userVoteStatus: vote,
+          };
+        }
+
+        return advice;
+      });
+
+      if (filter === 'top') {
+        const sortedOptimisticData = optimisticData.sort(
+          (a, b) => b.netVotes - a.netVotes
+        );
+
+        mutate({ ...data, data: sortedOptimisticData }, { revalidate: false });
+      } else {
+        mutate({ ...data, data: optimisticData }, { revalidate: false });
+      }
+
       await fetch(`/api/v1/advice/${id}`, {
         method: 'PUT',
         body: JSON.stringify({ vote }),
@@ -159,9 +180,10 @@ function AdviceListPage({
         },
       });
 
-      await mutate();
+      mutate();
     } catch (error) {
-      // TOOD: Add toast error message
+      console.error(error);
+      mutate();
     }
   };
 
@@ -197,6 +219,8 @@ function AdviceListPage({
   if (data.data.length === 0) {
     return null;
   }
+
+  // const sortedByHighest
 
   return (
     <>
