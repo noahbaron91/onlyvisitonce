@@ -208,7 +208,7 @@ app.get('/api/v1/fingerprint', async (req, res) => {
       return;
     }
 
-    const fingerprintExists = await prisma.broserFingerprint.findUnique({
+    const fingerprintExists = await prisma.browserFingerprint.findUnique({
       where: { fingerprint: id },
     });
 
@@ -217,7 +217,7 @@ app.get('/api/v1/fingerprint', async (req, res) => {
       return;
     }
 
-    await prisma.broserFingerprint.create({
+    await prisma.browserFingerprint.create({
       data: { fingerprint: id },
     });
 
