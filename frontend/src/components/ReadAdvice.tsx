@@ -149,7 +149,7 @@ function AdviceListPage({
   }>(`/api/v1/advice?filter=${filter}&page=${page}`, getAdvice);
 
   if (!data) {
-    return <p className='text-white'>Loading...</p>;
+    return <p className='text-white text-xl'>Loading...</p>;
   }
 
   const voteForAdvice = async (id: number, vote: -1 | 0 | 1) => {
