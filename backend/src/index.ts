@@ -56,6 +56,7 @@ async function getMostUpvotedAdvice(userId: number, page: number) {
   SELECT
     "advice"."id",
     "advice"."advice",
+    "advice"."createdAt",
     SUM("votes"."vote") AS "netVotes",
     CASE WHEN SUM(
       CASE WHEN "votes"."userId" = ${userId} THEN
@@ -80,7 +81,8 @@ async function getMostUpvotedAdvice(userId: number, page: number) {
   GROUP BY
     "advice"."id"
   ORDER BY
-    "netVotes" DESC
+    "netVotes" DESC,
+    "createdAt" DESC
   LIMIT ${PAGE_SIZE} OFFSET ${offset};`;
 
   const formattedResult = (result as any).map((row: any) => ({

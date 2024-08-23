@@ -143,6 +143,7 @@ function AdviceListPage({
       value: null | -1 | 1;
       netVotes: number;
       userVoteStatus: number;
+      createdAt: string;
     }[];
     hasMore: boolean;
   }>(`/api/v1/advice?filter=${filter}&page=${page}`, getAdvice);
@@ -166,9 +167,14 @@ function AdviceListPage({
       });
 
       if (filter === 'top') {
-        const sortedOptimisticData = optimisticData.sort(
-          (a, b) => b.netVotes - a.netVotes
-        );
+        const sortedOptimisticData = optimisticData.sort((a, b) => {
+          console.log(Date.parse(b.createdAt));
+          if (a.netVotes === b.netVotes) {
+            return Date.parse(b.createdAt) - Date.parse(a.createdAt);
+          }
+
+          return b.netVotes - a.netVotes;
+        });
 
         mutate({ ...data, data: sortedOptimisticData }, { revalidate: false });
       } else {
