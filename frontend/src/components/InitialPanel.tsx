@@ -21,8 +21,6 @@ export function InitialPanel({
 }) {
   const { amountOfAdviceLeft } = useAmountOfAdviceLeft();
 
-  console.log({ amountOfAdviceLeft });
-
   switch (amountOfAdviceLeft) {
     case 0:
       return <NoPiecesOfAdviceLeft onChangeState={onChangeState} />;

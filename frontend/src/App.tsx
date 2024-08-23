@@ -89,24 +89,11 @@ function CloseMusicIcon() {
   );
 }
 
-const useLocalStorageBlocking = () => {
-  useEffect(() => {
-    const hasPreviouslyVisited = localStorage.getItem('visited');
-
-    if (hasPreviouslyVisited === '1') {
-      localStorage.setItem('visited', '1');
-      return;
-    }
-
-    window.location.href = 'https://google.com';
-  }, []);
-};
-
 const useFingerprintBlocking = () => {
   const getFingerPrint = async () => {
-    const fp = await FingerprintJS.load();
+    const fingerprint = await FingerprintJS.load();
 
-    const { visitorId } = await fp.get();
+    const { visitorId } = await fingerprint.get();
 
     return visitorId;
   };
@@ -126,7 +113,6 @@ const useFingerprintBlocking = () => {
 
 function App() {
   useFingerprintBlocking();
-  useLocalStorageBlocking();
 
   useEffect(() => {
     const textElement = document.getElementById('text');
