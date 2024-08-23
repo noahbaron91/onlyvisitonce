@@ -85,6 +85,8 @@ function Advice({
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const netVotesWithSign = netVotes > 0 ? `+${netVotes}` : netVotes;
+
   return (
     <div className='flex flex-col ' key={id}>
       <p
@@ -109,7 +111,7 @@ function Advice({
           className='text-white text-xl min-w-4 text-center'
           onClick={(event) => event.stopPropagation()}
         >
-          {netVotes}
+          {netVotesWithSign}
         </p>
         <button
           style={{ fill: userVoteStatus === -1 ? '#00C2FF' : 'white' }}
