@@ -251,7 +251,7 @@ function AdviceList({ filter }: { filter: Filter }) {
   const [pageIndex, setPageIndex] = useState(0);
 
   return (
-    <div className='flex flex-col gap-3 py-3 overflow-y-scroll max-h-[calc(100vh-175px)] w-full'>
+    <div className='flex flex-col gap-3 py-3 overflow-y-scroll h-[calc(100vh-175px)] w-full'>
       {Array.from({ length: pageIndex + 1 }).map((_, index) => (
         <AdviceListPage
           key={index}

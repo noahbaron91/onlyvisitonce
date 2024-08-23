@@ -10,7 +10,7 @@ html {
   background: #03050d;
 }
 
-video {
+.fade-in {
   animation: fadeIn ease 2s;
 }
 

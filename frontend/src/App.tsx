@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import '@fontsource-variable/pixelify-sans';
 import { Panel } from './components/Panel';
+import { HasLoadedProvider } from './context/HasLoaded';
 
 function EyeIcon() {
   return (
@@ -96,31 +97,35 @@ function App() {
   const [isMusicPlaying, setIsMusicPlaying] = useState(true);
 
   return (
-    <div>
-      <video
-        autoPlay
-        loop
-        style={{ objectPosition: '-550px 0px' }}
-        className='-z-10 object-cover fixed top-0 left-0 w-screen h-screen'
-        src='https://static.onlyvisitonce.com/knight-at-night.mp4'
-        muted
-      />
-      {isPanelVisibile ? <Panel /> : null}
-      <div className='position fixed bottom-4 right-4 flex gap-3 items-center'>
-        <button
-          type='button'
-          onClick={() => setIsPanelVisible(!isPanelVisibile)}
-        >
-          {isPanelVisibile ? <EyeIcon /> : <CloseEyeIcon />}
-        </button>
-        <button
-          type='button'
-          onClick={() => setIsMusicPlaying(!isMusicPlaying)}
-        >
-          {isMusicPlaying ? <MusicIcon /> : <CloseMusicIcon />}
-        </button>
+    <HasLoadedProvider>
+      <div>
+        <video
+          autoPlay
+          loop
+          style={{ objectPosition: '-550px 0px' }}
+          className='fade-in -z-10 object-cover fixed top-0 left-0 w-screen h-screen'
+          src='https://static.onlyvisitonce.com/knight-at-night.mp4'
+          muted
+        />
+        {isPanelVisibile ? <Panel /> : null}
+        <div className='position fixed bottom-4 right-4 flex gap-3 items-center'>
+          <button
+            type='button'
+            id='visible-button'
+            onClick={() => setIsPanelVisible(!isPanelVisibile)}
+          >
+            {isPanelVisibile ? <EyeIcon /> : <CloseEyeIcon />}
+          </button>
+          <button
+            type='button'
+            id='music-button'
+            onClick={() => setIsMusicPlaying(!isMusicPlaying)}
+          >
+            {isMusicPlaying ? <MusicIcon /> : <CloseMusicIcon />}
+          </button>
+        </div>
       </div>
-    </div>
+    </HasLoadedProvider>
   );
 }
 
