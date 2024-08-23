@@ -3,6 +3,7 @@ import '@fontsource-variable/pixelify-sans';
 import { Panel } from './components/Panel';
 import { HasLoadedProvider } from './context/HasLoaded';
 import 'react-perfect-scrollbar/dist/css/styles.css';
+import { AmountOfAdviceLeftProvider } from './context/AmountOfAdviceLeft';
 
 function EyeIcon() {
   return (
@@ -119,35 +120,37 @@ function App() {
   }, []);
 
   return (
-    <HasLoadedProvider>
-      <div>
-        <video
-          autoPlay
-          loop
-          className='fade-in -z-10 object-cover object-[-550px_0px] sm:object-[-400px_0px] md:object-[-100px_0px] lg:object-[0px] fixed top-0 left-0 w-screen h-screen'
-          src='https://static.onlyvisitonce.com/knight-with-rain.mp4'
-          muted
-        />
-        {isPanelVisibile ? <Panel /> : null}
-        <div className='position fixed bottom-4 right-4 flex gap-3 items-center'>
-          <button
-            type='button'
-            onClick={() => setIsPanelVisible(!isPanelVisibile)}
-          >
-            {isPanelVisibile ? <EyeIcon /> : <CloseEyeIcon />}
-          </button>
-          <button type='button' onClick={handleToggleMusic}>
-            {isMusicPlaying ? <MusicIcon /> : <CloseMusicIcon />}
-            <audio
-              src='https://static.onlyvisitonce.com/rain-sounds-shorter.mp3'
-              autoPlay
-              loop
-              ref={audioRef}
-            ></audio>
-          </button>
+    <AmountOfAdviceLeftProvider>
+      <HasLoadedProvider>
+        <div>
+          <video
+            autoPlay
+            loop
+            className='fade-in -z-10 object-cover object-[-550px_0px] sm:object-[-400px_0px] md:object-[-100px_0px] lg:object-[0px] fixed top-0 left-0 w-screen h-screen'
+            src='https://static.onlyvisitonce.com/knight-with-rain.mp4'
+            muted
+          />
+          {isPanelVisibile ? <Panel /> : null}
+          <div className='position fixed bottom-4 right-4 flex gap-3 items-center'>
+            <button
+              type='button'
+              onClick={() => setIsPanelVisible(!isPanelVisibile)}
+            >
+              {isPanelVisibile ? <EyeIcon /> : <CloseEyeIcon />}
+            </button>
+            <button type='button' onClick={handleToggleMusic}>
+              {isMusicPlaying ? <MusicIcon /> : <CloseMusicIcon />}
+              <audio
+                src='https://static.onlyvisitonce.com/rain-sounds-shorter.mp3'
+                autoPlay
+                loop
+                ref={audioRef}
+              ></audio>
+            </button>
+          </div>
         </div>
-      </div>
-    </HasLoadedProvider>
+      </HasLoadedProvider>
+    </AmountOfAdviceLeftProvider>
   );
 }
 

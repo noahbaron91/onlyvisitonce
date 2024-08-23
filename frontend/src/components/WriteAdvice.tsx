@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { PageState } from './Panel';
+import { useAmountOfAdviceLeft } from '../context/AmountOfAdviceLeft';
 
 function ChevronLeft() {
   return (
@@ -26,6 +27,7 @@ export function WriteAdvice({
   onChangeState: (state: PageState) => void;
 }) {
   const [advice, setAdvice] = useState('');
+  const { leaveAdvice } = useAmountOfAdviceLeft();
 
   const submitAdvice = async () => {
     try {
@@ -39,7 +41,8 @@ export function WriteAdvice({
         }),
       });
 
-      onChangeState('success');
+      onChangeState('initial');
+      leaveAdvice();
     } catch (error) {
       // TODO: Add toast error message
       console.error(error);
