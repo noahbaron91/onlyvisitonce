@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { PageState } from './Panel';
 import { twMerge } from 'tailwind-merge';
 import useSWR from 'swr';
+import PerfectScrollbar from 'react-perfect-scrollbar';
 
 function ChevronLeft() {
   return (
@@ -220,8 +221,6 @@ function AdviceListPage({
     return null;
   }
 
-  // const sortedByHighest
-
   return (
     <>
       {data.data.map(({ advice, id, netVotes, userVoteStatus }) => (
@@ -237,7 +236,7 @@ function AdviceListPage({
       ))}
       {isLastPage && data.hasMore && (
         <button
-          className='text-black bg-white w-full py-2 font-bold mt-2'
+          className='text-black bg-white w-full rounded-lg py-2 font-bold mt-2'
           onClick={loadMore}
         >
           Read more
@@ -251,7 +250,7 @@ function AdviceList({ filter }: { filter: Filter }) {
   const [pageIndex, setPageIndex] = useState(0);
 
   return (
-    <div className='flex flex-col gap-3 py-3 overflow-y-scroll h-[calc(100vh-175px)] w-full'>
+    <PerfectScrollbar className='flex flex-col h-[calc(100vh-175px)] lg:h-[calc(100vh-206px)] gap-3 py-3 overflow-y-auto w-full'>
       {Array.from({ length: pageIndex + 1 }).map((_, index) => (
         <AdviceListPage
           key={index}
@@ -261,7 +260,7 @@ function AdviceList({ filter }: { filter: Filter }) {
           loadMore={() => setPageIndex((prev) => prev + 1)}
         />
       ))}
-    </div>
+    </PerfectScrollbar>
   );
 }
 
@@ -278,7 +277,7 @@ export function ReadAdvice({
         <button onClick={() => onChangeState('initial')}>
           <ChevronLeft />
         </button>
-        <h3 className='text-white text-xl'>Read advice</h3>
+        <h3 className='text-white text-xl md:text-2xl'>Read advice</h3>
       </div>
       <div className='flex items-center gap-6'>
         <button
@@ -290,7 +289,7 @@ export function ReadAdvice({
         >
           Top
         </button>
-        <p
+        <button
           className={twMerge(
             'text-white text-xl',
             filter === 'recent' && 'underline'
@@ -298,7 +297,7 @@ export function ReadAdvice({
           onClick={() => setFilter('recent')}
         >
           Recent
-        </p>
+        </button>
       </div>
       <AdviceList filter={filter} />
     </div>

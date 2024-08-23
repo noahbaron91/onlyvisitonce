@@ -62,7 +62,7 @@ export function WriteAdvice({
         <button onClick={() => onChangeState('initial')}>
           <ChevronLeft />
         </button>
-        <h3 className='text-white text-xl'>Write advice</h3>
+        <h3 className='text-white text-xl md:text-2xl'>Write advice</h3>
       </div>
       <p className='text-white text-xl'>
         What is a piece of advice you would give to your past self?
@@ -71,11 +71,14 @@ export function WriteAdvice({
         value={advice}
         onChange={(event) => setAdvice(event.target.value)}
         placeholder='Write some wise words for future visitors'
-        className='text-white outline-none w-full px-4 py-2 h-32 rounded-lg'
+        className='text-white outline-none w-full px-4 py-2 h-32 rounded-lg md:text-lg border border-stone-800'
         style={{ background: 'rgba(0, 0, 0, 0.5)' }}
         required
       />
-      <button className='text-white text-xl' type='submit'>
+      <button
+        className='bg-white px-9 py-2 w-full rounded-md text-black text-lg md:px-11 md:w-fit'
+        type='submit'
+      >
         Submit
       </button>
     </form>

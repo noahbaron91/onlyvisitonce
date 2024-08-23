@@ -4,6 +4,7 @@
 
 body {
   font-family: 'Pixelify Sans Variable', system-ui;
+  overflow-y: clip;
 }
 
 html {

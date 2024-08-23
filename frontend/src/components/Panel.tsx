@@ -28,7 +28,7 @@ function InsideContent() {
 export function Panel() {
   return (
     <div
-      className='rounded-xl my-3 py-4 px-4 mx-3 text-left flex flex-col gap-5'
+      className='rounded-xl max-h-screen m-3 lg:m-8 p-4 text-left flex flex-col gap-5 max-w-2xl md:p-7 border border-stone-800'
       style={{ background: 'rgba(0, 0, 0, 0.5)' }}
     >
       <InsideContent />
