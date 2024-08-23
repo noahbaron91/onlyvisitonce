@@ -86,23 +86,14 @@ export function InitialPanel({
     if (hasLoaded) return;
 
     const adviceButtons = document.getElementById('advice-buttons');
-    const musicButton = document.getElementById('music-button');
-    const visibleButton = document.getElementById('visible-button');
 
-    if (!adviceButtons || !musicButton || !visibleButton) return;
+    if (!adviceButtons) return;
 
     adviceButtons.style.display = 'none';
-    musicButton.style.display = 'none';
-    visibleButton.style.display = 'none';
 
     const timeout = setTimeout(() => {
       adviceButtons.style.display = 'flex';
-      musicButton.style.display = 'block';
-      visibleButton.style.display = 'block';
-
       adviceButtons.classList.add('fade-in');
-      visibleButton.classList.add('fade-in');
-      musicButton.classList.add('fade-in');
     }, INITIAL_DELAY + TALKING_DELAY + MESSAGE_1.length * TALKING_SPEED + TALKING_DELAY + MESSAGE_2.length * TALKING_SPEED + TALKING_DELAY + MESSAGE_3.length * TALKING_SPEED + MESSAGE_4.length * TALKING_SPEED);
 
     return () => {

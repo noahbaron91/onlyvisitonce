@@ -132,12 +132,11 @@ function App() {
         <div className='position fixed bottom-4 right-4 flex gap-3 items-center'>
           <button
             type='button'
-            id='visible-button'
             onClick={() => setIsPanelVisible(!isPanelVisibile)}
           >
             {isPanelVisibile ? <EyeIcon /> : <CloseEyeIcon />}
           </button>
-          <button type='button' id='music-button' onClick={handleToggleMusic}>
+          <button type='button' onClick={handleToggleMusic}>
             {isMusicPlaying ? <MusicIcon /> : <CloseMusicIcon />}
             <audio
               src='https://static.onlyvisitonce.com/rain-sounds-shorter.mp3'
