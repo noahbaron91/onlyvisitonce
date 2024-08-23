@@ -13,7 +13,17 @@ app.use(cookieParser());
 const allowedIp = process.env.ALLOWED_IP;
 
 app.use((req, res, next) => {
+  if (req.path !== '/') {
+    next();
+    return;
+  }
+
   // Cookie blocking mechanism
+  if (req.ip === allowedIp && req.query.dev === 'true') {
+    next();
+    return;
+  }
+
   if (req.cookies['visited'] === 1) {
     return;
   }
