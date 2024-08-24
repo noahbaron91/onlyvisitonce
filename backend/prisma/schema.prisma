@@ -10,21 +10,23 @@ datasource db {
 
 model BrowserFingerprint {
   id          Int      @id @default(autoincrement())
-  fingerprint String   @unique
   createdAt   DateTime @default(now())
+  fingerprint String   @unique
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  ip    String  @unique
-  Votes Votes[]
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  ip        String   @unique
+  Votes     Votes[]
 }
 
 model Votes {
-  id       Int @id @default(autoincrement())
-  userId   Int
-  adviceId Int
-  vote     Int // 1 for upvote, -1 for downvote
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  userId    Int
+  adviceId  Int
+  vote      Int // 1 for upvote, -1 for downvote
 
   user   User   @relation(fields: [userId], references: [id])
   advice Advice @relation(fields: [adviceId], references: [id])
