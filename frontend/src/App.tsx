@@ -4,11 +4,11 @@ import { Panel } from './components/Panel';
 import { HasLoadedProvider } from './context/HasLoaded';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import { AmountOfAdviceLeftProvider } from './context/AmountOfAdviceLeft';
-import { useFingerprintBlocking } from './hooks/useFingerprintBlocking';
+// import { useFingerprintBlocking } from './hooks/useFingerprintBlocking';
 import * as i from './Icons';
 
 function App() {
-  useFingerprintBlocking();
+  // useFingerprintBlocking();
 
   const [isPanelVisibile, setIsPanelVisible] = useState(true);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
