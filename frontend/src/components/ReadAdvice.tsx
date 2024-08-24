@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { PageState } from './Panel';
 import { twMerge } from 'tailwind-merge';
-import useSWR from 'swr';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
 function ChevronLeft() {
@@ -60,11 +59,6 @@ function Downvote() {
     </svg>
   );
 }
-
-const getAdvice = async (url: string) => {
-  const res = await fetch(url);
-  return res.json();
-};
 
 type Filter = 'top' | 'recent';
 
@@ -125,6 +119,55 @@ function Advice({
   );
 }
 
+const fetchData = async (url: string) => {
+  try {
+    const res = await fetch(url);
+    return res.json();
+  } catch (error) {
+    // retry in 5 seconds
+    return new Promise((resolve) => {
+      setTimeout(async () => {
+        resolve(fetchData(url));
+      }, 5000);
+    });
+  }
+};
+
+const useAdvice = ({
+  filter,
+  page,
+}: {
+  page: number;
+  filter: 'top' | 'recent';
+}) => {
+  const [advice, setAdvice] = useState<
+    | {
+        data: {
+          id: number;
+          advice: string;
+          value: null | -1 | 1;
+          netVotes: number;
+          userVoteStatus: number;
+          createdAt: string;
+        }[];
+        hasMore: boolean;
+      }
+    | undefined
+  >(undefined);
+
+  useEffect(() => {
+    try {
+      fetchData(`/api/v1/advice?filter=${filter}&page=${page}`).then((data) => {
+        setAdvice(data);
+      });
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }, [filter, page]);
+
+  return { advice, setAdvice };
+};
+
 function AdviceListPage({
   filter,
   page,
@@ -136,25 +179,15 @@ function AdviceListPage({
   isLastPage: boolean;
   loadMore: () => void;
 }) {
-  const { data, mutate } = useSWR<{
-    data: {
-      id: number;
-      advice: string;
-      value: null | -1 | 1;
-      netVotes: number;
-      userVoteStatus: number;
-      createdAt: string;
-    }[];
-    hasMore: boolean;
-  }>(`/api/v1/advice?filter=${filter}&page=${page}`, getAdvice);
+  const { advice, setAdvice } = useAdvice({ filter, page });
 
-  if (!data) {
+  if (!advice) {
     return <p className='text-white text-xl'>Loading...</p>;
   }
 
   const voteForAdvice = async (id: number, vote: -1 | 0 | 1) => {
     try {
-      const optimisticData = data.data.map((advice) => {
+      const optimisticData = advice.data.map((advice) => {
         if (advice.id === id) {
           return {
             ...advice,
@@ -166,20 +199,7 @@ function AdviceListPage({
         return advice;
       });
 
-      if (filter === 'top') {
-        const sortedOptimisticData = optimisticData.sort((a, b) => {
-          console.log(Date.parse(b.createdAt));
-          if (a.netVotes === b.netVotes) {
-            return Date.parse(b.createdAt) - Date.parse(a.createdAt);
-          }
-
-          return b.netVotes - a.netVotes;
-        });
-
-        mutate({ ...data, data: sortedOptimisticData }, { revalidate: false });
-      } else {
-        mutate({ ...data, data: optimisticData }, { revalidate: false });
-      }
+      setAdvice({ ...advice, data: optimisticData });
 
       await fetch(`/api/v1/advice/${id}`, {
         method: 'PUT',
@@ -188,21 +208,18 @@ function AdviceListPage({
           'Content-Type': 'application/json',
         },
       });
-
-      mutate();
     } catch (error) {
       console.error(error);
-      mutate();
     }
   };
 
   const handleUpvoteAdvice = async (id: number) => {
-    if (!data) return;
-
-    const advice = data.data.find((advice) => advice.id === id);
     if (!advice) return;
 
-    if (advice.userVoteStatus === 1) {
+    const currentAdvice = advice.data.find((advice) => advice.id === id);
+    if (!currentAdvice) return;
+
+    if (currentAdvice.userVoteStatus === 1) {
       await voteForAdvice(id, 0);
       return;
     }
@@ -211,13 +228,12 @@ function AdviceListPage({
   };
 
   const handleDownvoteAdvice = async (id: number) => {
-    if (!data) return;
-
-    const advice = data.data.find((advice) => advice.id === id);
-
     if (!advice) return;
 
-    if (advice.userVoteStatus === -1) {
+    const currentAdvice = advice.data.find((advice) => advice.id === id);
+    if (!currentAdvice) return;
+
+    if (currentAdvice.userVoteStatus === -1) {
       await voteForAdvice(id, 0);
       return;
     }
@@ -225,13 +241,13 @@ function AdviceListPage({
     await voteForAdvice(id, -1);
   };
 
-  if (data.data.length === 0) {
+  if (advice.data.length === 0) {
     return null;
   }
 
   return (
     <>
-      {data.data.map(({ advice, id, netVotes, userVoteStatus }) => (
+      {advice.data.map(({ advice, id, netVotes, userVoteStatus }) => (
         <Advice
           advice={advice}
           id={id}
@@ -242,7 +258,7 @@ function AdviceListPage({
           userVoteStatus={userVoteStatus}
         />
       ))}
-      {isLastPage && data.hasMore && (
+      {isLastPage && advice.hasMore && (
         <button
           className='text-black bg-white w-full rounded-lg py-2 font-bold mt-2'
           onClick={loadMore}

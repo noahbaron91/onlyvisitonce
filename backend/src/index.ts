@@ -78,37 +78,25 @@ async function getMostUpvotedAdvice(userId: number, page: number) {
   const offset = page * PAGE_SIZE;
 
   const result = await prisma.$queryRaw`
-  SELECT
+ SELECT
     "advice"."id",
     "advice"."advice",
     "advice"."createdAt",
-    SUM("votes"."vote") AS "netVotes",
-    CASE WHEN SUM(
-      CASE WHEN "votes"."userId" = ${userId} THEN
-        "votes"."vote"
-      ELSE
-        0
-      END) > 0 THEN
-      1
-    WHEN SUM(
-      CASE WHEN "votes"."userId" = ${userId} THEN
-        "votes"."vote"
-      ELSE
-        0
-      END) < 0 THEN
-      - 1
-    ELSE
-      0
+    COALESCE(SUM("votes"."vote"), 0) AS "netVotes",
+    CASE 
+        WHEN COALESCE(SUM(CASE WHEN "votes"."userId" = ${userId} THEN "votes"."vote" ELSE 0 END), 0) > 0 THEN 1
+        WHEN COALESCE(SUM(CASE WHEN "votes"."userId" = ${userId} THEN "votes"."vote" ELSE 0 END), 0) < 0 THEN -1
+        ELSE 0
     END AS "userVoteStatus"
-  FROM
+FROM
     "Advice" AS "advice"
     LEFT JOIN "Votes" AS "votes" ON "advice"."id" = "votes"."adviceId"
-  GROUP BY
-    "advice"."id"
-  ORDER BY
+GROUP BY
+    "advice"."id", "advice"."advice", "advice"."createdAt"
+ORDER BY
     "netVotes" DESC,
-    "createdAt" DESC
-  LIMIT ${PAGE_SIZE} OFFSET ${offset};`;
+    "advice"."createdAt" DESC
+LIMIT ${PAGE_SIZE} OFFSET ${offset};`;
 
   const formattedResult = (result as any).map((row: any) => ({
     ...row,
@@ -119,6 +107,8 @@ async function getMostUpvotedAdvice(userId: number, page: number) {
 }
 
 const getMostRecentAdvice = async (userId: number, page: number) => {
+  const offset = page * PAGE_SIZE;
+
   const result = await prisma.$queryRaw`
   SELECT
     "advice"."id",
@@ -149,7 +139,7 @@ const getMostRecentAdvice = async (userId: number, page: number) => {
     "advice"."id"
   ORDER BY
     "createdAt" DESC
-  LIMIT ${PAGE_SIZE};`;
+  LIMIT ${PAGE_SIZE} OFFSET ${offset};`;
 
   const formattedResult = (result as any).map((row: any) => ({
     ...row,
