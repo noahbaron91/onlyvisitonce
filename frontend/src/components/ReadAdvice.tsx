@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { PageState } from './Panel';
 import { twMerge } from 'tailwind-merge';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 
 function ChevronLeft() {
   return (
@@ -122,13 +121,18 @@ function Advice({
 const fetchData = async (url: string) => {
   try {
     const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
     return res.json();
   } catch (error) {
-    // retry in 5 seconds
+    // retry in 2.5 seconds
     return new Promise((resolve) => {
       setTimeout(async () => {
         resolve(fetchData(url));
-      }, 5000);
+      }, 2500);
     });
   }
 };
@@ -274,7 +278,7 @@ function AdviceList({ filter }: { filter: Filter }) {
   const [pageIndex, setPageIndex] = useState(0);
 
   return (
-    <PerfectScrollbar className='flex flex-col h-[calc(100vh-175px)] lg:h-[calc(100vh-206px)] gap-3 py-3 overflow-y-auto w-full'>
+    <div className='hide-scrollbar flex flex-col h-[calc(100vh-175px)] lg:h-[calc(100vh-206px)] gap-3 py-3 overflow-y-auto w-full'>
       {Array.from({ length: pageIndex + 1 }).map((_, index) => (
         <AdviceListPage
           key={index}
@@ -284,7 +288,7 @@ function AdviceList({ filter }: { filter: Filter }) {
           loadMore={() => setPageIndex((prev) => prev + 1)}
         />
       ))}
-    </PerfectScrollbar>
+    </div>
   );
 }
 
