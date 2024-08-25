@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import '@fontsource-variable/pixelify-sans';
 import { Panel } from './components/Panel';
 import { HasLoadedProvider } from './context/HasLoaded';
-// import 'react-perfect-scrollbar/dist/css/styles.css';
 import { AmountOfAdviceLeftProvider } from './context/AmountOfAdviceLeft';
 // import { useFingerprintBlocking } from './hooks/useFingerprintBlocking';
 import * as i from './Icons';
