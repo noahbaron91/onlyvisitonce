@@ -5,9 +5,11 @@ import { HasLoadedProvider } from './context/HasLoaded';
 import { AmountOfAdviceLeftProvider } from './context/AmountOfAdviceLeft';
 // import { useFingerprintBlocking } from './hooks/useFingerprintBlocking';
 import * as i from './Icons';
+import { useLocalStorageBlocking } from './hooks/useLocalStorageBlocking';
 
 function App() {
   // useFingerprintBlocking();
+  useLocalStorageBlocking();
 
   const [isPanelVisibile, setIsPanelVisible] = useState(true);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
