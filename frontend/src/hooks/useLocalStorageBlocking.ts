@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 export const useLocalStorageBlocking = () => {
-  // Prevents the user from being instantly redirected to Google
+  // Prevents the user from being checked on every render
   const hasFetchedLocalStorage = useRef(false);
 
   useEffect(() => {
