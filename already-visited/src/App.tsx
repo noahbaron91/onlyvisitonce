@@ -5,8 +5,8 @@ import '@fontsource-variable/pixelify-sans';
 export const TALKING_SPEED = 50;
 export const TALKING_DELAY = 250;
 
-const MESSAGE_1 = "You've been here before, traveller";
-const MESSAGE_2 = 'Keep moving forward';
+const MESSAGE_1 = "You've already passed this way before";
+const MESSAGE_2 = "Your journey lies ahead—don't look back";
 
 const useDelayedText = (message: string, id: string, initialDelay: number) => {
   const timeoutRefs = useRef<number[]>([]);
