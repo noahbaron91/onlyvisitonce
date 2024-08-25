@@ -16,6 +16,6 @@ export const useLocalStorageBlocking = () => {
       window.location.href = 'https://visited.onlyvisitonce.com';
     }
 
-    localStorage.setItem('visited', 'true');
+    localStorage.setItem('visited', '1');
   }, []);
 };
