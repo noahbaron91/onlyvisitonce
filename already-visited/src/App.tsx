@@ -93,7 +93,7 @@ function App() {
         muted
       />
       {isPanelVisibile ? <Panel /> : null}
-      <div className='position fixed bottom-4 right-4 flex gap-3 items-center'>
+      <div className='position fixed bottom-4 right-4 flex gap-3 items-center sm:right-6 sm:bottom-6 md:right-8 md:bottom-8'>
         <button
           type='button'
           onClick={() => setIsPanelVisible(!isPanelVisibile)}
@@ -109,6 +109,18 @@ function App() {
             ref={audioRef}
           ></audio>
         </button>
+      </div>
+      <div className='position fixed bottom-4 left-4 flex gap-3 items-center text-white sm:left-6 sm:bottom-6 md:left-8 md:bottom-8'>
+        <a href='https://github.com/noahbaron91/onlyvisitonce' target='_blank'>
+          <i.GitHubIcon />
+        </a>
+        <a
+          href='https://buymeacoffee.com/noahbaron'
+          className='underline text-lg'
+          target='_blank'
+        >
+          Buy me a coffee
+        </a>
       </div>
     </div>
   );
