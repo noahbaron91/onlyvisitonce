@@ -121,13 +121,18 @@ function Advice({
 const fetchData = async (url: string) => {
   try {
     const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
     return res.json();
   } catch (error) {
-    // retry in 5 seconds
+    // retry in 2.5 seconds
     return new Promise((resolve) => {
       setTimeout(async () => {
         resolve(fetchData(url));
-      }, 5000);
+      }, 2500);
     });
   }
 };

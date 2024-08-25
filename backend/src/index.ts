@@ -154,7 +154,6 @@ const checkIfHasMore = async (page: number) => {
   return numberOfAdvice > (page + 1) * PAGE_SIZE;
 };
 
-// TODO: Implement pagination
 app.get('/api/v1/advice', async (req, res) => {
   if (req.query.filter !== 'top' && req.query.filter !== 'recent') {
     res.status(400).send('Invalid filter');
