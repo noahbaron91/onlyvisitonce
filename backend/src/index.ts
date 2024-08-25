@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 
   if (req.cookies['visited'] === '1') {
     console.log(req.ip, 'Cookie exists, user has already visited this website');
-    res.status(403).send('You have already visited this website');
+    res.redirect(302, 'https://visited.onlyvisitonce.com');
     return;
   }
 
@@ -51,7 +51,7 @@ app.use(async (req, res, next) => {
 
   if (typeof clientIP !== 'string') {
     console.log('Invalid IP');
-    res.status(403).send('You have already visited this website');
+    res.redirect(302, 'https://visited.onlyvisitonce.com');
     return;
   }
 
@@ -59,7 +59,7 @@ app.use(async (req, res, next) => {
 
   if (user) {
     console.log(req.ip, 'User already exists');
-    res.status(403).send('You have already visited this website');
+    res.redirect(302, 'https://visited.onlyvisitonce.com');
     return;
   }
 
