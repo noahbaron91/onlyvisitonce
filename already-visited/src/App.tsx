@@ -87,6 +87,7 @@ function App() {
     <div>
       <video
         autoPlay
+        playsInline
         loop
         className='fade-in -z-10 object-cover object-[-650px_0px] sm:object-[-400px_0px] md:object-[-100px_0px] lg:object-[0px] fixed top-0 left-0 w-screen h-screen'
         src='https://static.onlyvisitonce.com/knight-gone.mp4'
