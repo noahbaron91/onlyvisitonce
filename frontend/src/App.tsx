@@ -43,7 +43,7 @@ function App() {
             autoPlay
             loop
             playsInline
-            className='fade-in pointer-events-none -z-10 object-cover object-[-550px_0px] sm:object-[-400px_0px] md:object-[-100px_0px] lg:object-[0px] fixed top-0 left-0 w-screen h-screen'
+            className='fade-in -z-10 object-cover object-[-550px_0px] sm:object-[-400px_0px] md:object-[-100px_0px] lg:object-[0px] fixed top-0 left-0 w-screen h-screen'
             src='https://static.onlyvisitonce.com/knight-with-rain.mp4'
             muted
           />
