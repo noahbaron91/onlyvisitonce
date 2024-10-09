@@ -13,15 +13,15 @@ app.use(cookieParser());
 const allowedIp = process.env.ALLOWED_IP;
 
 app.use((req, res, next) => {
-  console.log('in request', req.subdomains);
+  console.log('in request', req.subdomains.includes('bypass'));
 
-  if (req.path !== '/') {
+  // Check if the bypass subdomain is present
+  if (req.subdomains.includes('bypass')) {
     next();
     return;
   }
 
-  // Check if the bypass subdomain is present
-  if (req.subdomains.includes('bypass')) {
+  if (req.path !== '/') {
     next();
     return;
   }
