@@ -24,6 +24,8 @@ app.use((req, res, next) => {
     return;
   }
 
+  console.log(req.subdomains);
+
   // Check if the bypass subdomain is present
   if (req.subdomains.includes('bypass')) {
     next();
