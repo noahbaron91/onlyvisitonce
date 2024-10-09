@@ -24,6 +24,12 @@ app.use((req, res, next) => {
     return;
   }
 
+  // Check if the bypass subdomain is present
+  if (req.subdomains.includes('bypass')) {
+    next();
+    return;
+  }
+
   if (req.cookies['visited'] === '1') {
     console.log(req.ip, 'Cookie exists, user has already visited this website');
     res.redirect(302, 'https://visited.onlyvisitonce.com');
