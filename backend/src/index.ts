@@ -18,16 +18,14 @@ app.use((req, res, next) => {
     return;
   }
 
-  // Cookie blocking mechanism
-  if (req.ip === allowedIp && req.query.dev === 'true') {
+  // Check if the bypass subdomain is present
+  if (req.subdomains.includes('bypass')) {
     next();
     return;
   }
 
-  console.log(req.subdomains);
-
-  // Check if the bypass subdomain is present
-  if (req.subdomains.includes('bypass')) {
+  // Cookie blocking mechanism
+  if (req.ip === allowedIp && req.query.dev === 'true') {
     next();
     return;
   }
