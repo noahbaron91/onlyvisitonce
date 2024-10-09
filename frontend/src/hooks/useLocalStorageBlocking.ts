@@ -13,6 +13,9 @@ export const useLocalStorageBlocking = () => {
     const hasAlreadyVisited = localStorage.getItem('visited');
 
     if (hasAlreadyVisited) {
+      const subdomain = window.location.origin.split('.')[0];
+      if (subdomain.includes('bypass')) return;
+
       window.location.href = 'https://visited.onlyvisitonce.com';
     }
 
